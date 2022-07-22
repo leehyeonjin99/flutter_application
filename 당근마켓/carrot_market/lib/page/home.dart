@@ -1,95 +1,35 @@
+import 'package:carrot_market/repository/contents_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import "package:intl/intl.dart";
 
-class Home extends StatefulWidget {
-  Home({Key? key}) : super(key: key);
-
+class Home extends StatefulWidget{
   @override
   _HomeState createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> {
+class _HomeState extends State<Home>{
 
-  List<Map<String, String>> datas = [];
-  int _currentPageIndex = 0;
+  String currentLocation = "ara";
+  ContentRepository contentRepository = ContentRepository();
+  final Map<String, String> locationTypeToString = {
+    "ara": "아라동",
+    "ora": "오라동",
+    "donam": "도남동"
+  };
 
   @override
   void initState() {
     super.initState();
-    _currentPageIndex = 0;
-    datas = [
-      {
-        "image": "assets/images/ara-1.jpeg",
-        "title": "네메시스 축구화 275",
-        "location": "제주 제주시 아라동",
-        "price": "30000",
-        "likes": "2"
-      },
-      {
-        "image": "assets/images/ara-2.jpeg",
-        "title": "LA 갈비 5kg 팔아요!",
-        "location": "제주 제주시 아라동",
-        "price": "100000",
-        "likes": "5"
-      },
-      {
-        "image": "assets/images/ara-3.jpeg",
-        "title": "치약 팝니다.",
-        "location": "제주 제주시 아라동",
-        "price": "5000",
-        "likes": "0"
-      },
-      {
-        "image": "assets/images/ara-4.jpeg",
-        "title": "[풀박스] 맥북프로 16인치 터치바 스페이스그레이",
-        "location": "제주 제주시 아라동",
-        "price": "2500000",
-        "likes": "6"
-      },
-      {
-        "image": "assets/images/ara-5.jpeg",
-        "title": "디월트존기임팩",
-        "location": "제주 제주시 아라동",
-        "price": "180000",
-        "likes": "2"
-      },
-      {
-        "image": "assets/images/ara-6.jpeg",
-        "title": "갤럭시s10",
-        "location": "제주 제주시 아라동",
-        "price": "30000",
-        "likes": "2"
-      },
-      {
-        "image": "assets/images/ara-7.jpeg",
-        "title": "선반",
-        "location": "제주 제주시 아라동",
-        "price": "15000",
-        "likes": "2"
-      },
-      {
-        "image": "assets/images/ara-8.jpeg",
-        "title": "냉장 쇼케이스",
-        "location": "제주 제주시 아라동",
-        "price": "80000",
-        "likes": "3"
-      },
-      {
-        "image": "assets/images/ara-9.jpeg",
-        "title": "대우 미니 냉장고",
-        "location": "제주 제주시 아라동",
-        "price": "30000",
-        "likes": "3"
-      },
-      {
-        "image": "assets/images/ara-10.jpeg",
-        "title": "멜킨스 풀업 턱걸이 판매합니다.",
-        "location": "제주 제주시 아라동",
-        "price": "50000",
-        "likes": "7"
-      },
-    ];
+    currentLocation = "ara";
+  }
+
+  @override
+  Widget build(BuildContext context){
+    return Scaffold(
+      appBar: _appbarWidget(),
+      body: _bodyWidget(),
+    );
   }
 
   PreferredSizeWidget _appbarWidget(){
@@ -103,17 +43,47 @@ class _HomeState extends State<Home> {
           onLongPress: (){
             print("Long Press!!");
           },
-          child: Row(
-            children: [
-              Text(
-                '아라동',
-                style: TextStyle(color: Colors.black),
+          child: PopupMenuButton<String>(
+            offset: Offset(-10, 25),
+            shape: ShapeBorder.lerp(
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+              1
+            ),
+            onSelected: (String value) {
+              print(value);
+              setState(() {
+                currentLocation = value;
+              });
+            },
+            itemBuilder: (BuildContext context) {
+              return [
+                PopupMenuItem(
+                  value: "ara",
+                  child: Text("아라동"),
                 ),
-              Icon(
-                Icons.arrow_drop_down,
-                color: Colors.black,
-              )
-            ],
+                PopupMenuItem(
+                  value: "ora",
+                  child: Text("오라동"),
+                ),
+                PopupMenuItem(
+                  value: "donam",
+                  child: Text("도남동"),
+                )
+              ];
+            },
+            child: Row(
+              children: [
+                Text(
+                  locationTypeToString[currentLocation]!,
+                  style: TextStyle(color: Colors.black),
+                  ),
+                Icon(
+                  Icons.arrow_drop_down,
+                  color: Colors.black,
+                )
+              ],
+            ),
           ),
         ),
         actions: [
@@ -151,13 +121,20 @@ class _HomeState extends State<Home> {
         ],
       );
   }
+  
+  _loadContents(){
+    return contentRepository.loadContentsFromLocation(currentLocation);
+  }
 
   final oCcy = new NumberFormat("#,###", "ko_KR");
   String calcStringToWon(String priceString){
+    if (priceString == "무료나눔"){
+      return priceString;
+    }
     return "${oCcy.format(int.parse(priceString))}원";
   }
 
-  Widget _bodyWidget(){
+  _makeDataList(List<Map<String, String>> datas){
     return ListView.separated(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       itemBuilder: (BuildContext context, int index){
@@ -241,46 +218,26 @@ class _HomeState extends State<Home> {
     );
   }
 
-  BottomNavigationBarItem _bottomNavigationBar(String IconName, String label){
-    return BottomNavigationBarItem(
-      icon: Padding(
-        padding: const EdgeInsets.only(bottom: 5.0),
-        child: SvgPicture.asset(
-          'assets/svg/${IconName}_off.svg',
-          width: 22
-        ),
-      ),
-      label: label
-    );
-  }
+  Widget _bodyWidget(){
+    return FutureBuilder(
+      future: _loadContents(),
+      builder: (BuildContext context, dynamic snapshot){
+        if (snapshot.connectionState != ConnectionState.done){
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        }
 
-  Widget _bottomNavigationBarWidget(){
-    return BottomNavigationBar(
-      type: BottomNavigationBarType.fixed,
-      selectedFontSize: 12,
-      onTap: (int index){
-        print(index);
-        setState(() {
-          _currentPageIndex = index;
-        });
+        if (snapshot.hasData){
+          return _makeDataList(snapshot.data);
+        }
+
+        return Center(
+          child: Text("해당 지역에 데이터가 없습니다."),
+        );
+        
       },
-      currentIndex: _currentPageIndex,
-      items: [
-        _bottomNavigationBar("home", "홈"),
-        _bottomNavigationBar("notes", "동네 생활"),
-        _bottomNavigationBar("location", "내 근처"),
-        _bottomNavigationBar("chat", "채팅"),
-        _bottomNavigationBar("user", "나의 당근")
-      ],
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: _appbarWidget(),
-      body: _bodyWidget(),
-      bottomNavigationBar: _bottomNavigationBarWidget(),
     );
   }
 }
+
