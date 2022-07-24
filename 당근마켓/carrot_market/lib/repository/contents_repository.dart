@@ -2,6 +2,7 @@ class ContentRepository{
   Map<String, dynamic> datas = {
     "ara": [
       {
+        "cid": "1",
         "image": "assets/images/ara-1.jpeg",
         "title": "네메시스 축구화 275",
         "location": "제주 제주시 아라동",
@@ -9,6 +10,7 @@ class ContentRepository{
         "likes": "2"
       },
       {
+        "cid": "2",
         "image": "assets/images/ara-2.jpeg",
         "title": "LA 갈비 5kg 팔아요!",
         "location": "제주 제주시 아라동",
@@ -16,6 +18,7 @@ class ContentRepository{
         "likes": "5"
       },
       {
+        "cid": "3",
         "image": "assets/images/ara-3.jpeg",
         "title": "치약 팝니다.",
         "location": "제주 제주시 아라동",
@@ -23,6 +26,7 @@ class ContentRepository{
         "likes": "0"
       },
       {
+        "cid": "4",
         "image": "assets/images/ara-4.jpeg",
         "title": "[풀박스] 맥북프로 16인치 터치바 스페이스그레이",
         "location": "제주 제주시 아라동",
@@ -30,6 +34,7 @@ class ContentRepository{
         "likes": "6"
       },
       {
+        "cid": "5",
         "image": "assets/images/ara-5.jpeg",
         "title": "디월트존기임팩",
         "location": "제주 제주시 아라동",
@@ -37,6 +42,7 @@ class ContentRepository{
         "likes": "2"
       },
       {
+        "cid": "6",
         "image": "assets/images/ara-6.jpeg",
         "title": "갤럭시s10",
         "location": "제주 제주시 아라동",
@@ -44,6 +50,7 @@ class ContentRepository{
         "likes": "2"
       },
       {
+        "cid": "7",
         "image": "assets/images/ara-7.jpeg",
         "title": "선반",
         "location": "제주 제주시 아라동",
@@ -51,6 +58,7 @@ class ContentRepository{
         "likes": "2"
       },
       {
+        "cid": "8",
         "image": "assets/images/ara-8.jpeg",
         "title": "냉장 쇼케이스",
         "location": "제주 제주시 아라동",
@@ -58,6 +66,7 @@ class ContentRepository{
         "likes": "3"
       },
       {
+        "cid": "9",
         "image": "assets/images/ara-9.jpeg",
         "title": "대우 미니 냉장고",
         "location": "제주 제주시 아라동",
@@ -65,6 +74,7 @@ class ContentRepository{
         "likes": "3"
       },
       {
+        "cid": "10",
         "image": "assets/images/ara-10.jpeg",
         "title": "멜킨스 풀업 턱걸이 판매합니다.",
         "location": "제주 제주시 아라동",

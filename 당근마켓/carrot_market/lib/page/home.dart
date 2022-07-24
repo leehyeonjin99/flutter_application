@@ -1,4 +1,5 @@
 import 'package:carrot_market/repository/contents_repository.dart';
+import 'package:carrot_market/page/detail.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import "package:intl/intl.dart";
@@ -140,70 +141,86 @@ class _HomeState extends State<Home>{
       itemBuilder: (BuildContext context, int index){
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: Container(
-            width: MediaQuery.of(context).size.width - 100,
-            child: Row(
-              children: <Widget>[
-                ClipRRect(
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                  child: Image.asset(
-                    datas[index]["image"]!,
-                    width: 100,
-                    height: 100,
-                  ),
-                ),
-                Expanded(
-                  child: Container(
-                    height: 100,
-                    padding: const EdgeInsets.only(left: 20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          datas[index]["title"]!,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 15,
-                          ),
-                        ),
-                        SizedBox(height: 5,),
-                        Text(
-                          datas[index]["location"]!,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.black.withOpacity(0.3)
-                          ),
-                        ),
-                        SizedBox(height: 5,),
-                        Text(
-                          calcStringToWon(datas[index]["price"]!),
-                          style: TextStyle(
-                            fontWeight: FontWeight.w500
-                          ),
-                          ),
-                        Expanded(
-                          child: Container(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: <Widget>[
-                                SvgPicture.asset(
-                                  "assets/svg/heart_off.svg",
-                                  width: 13,
-                                  height: 13,
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 5),
-                                  child: Text(datas[index]["likes"]!),
-                                ),
-                              ],
-                            ),
-                          ),
-                        )
-                      ],
+          child: GestureDetector(
+            onTap:() {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (BuildContext context) {
+                    return DetailContentView(data: datas[index]);
+                  },
+                )
+              );
+              print(datas[index]["title"]);
+            },
+            child: Container(
+              width: MediaQuery.of(context).size.width - 100,
+              child: Row(
+                children: <Widget>[
+                  ClipRRect(
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                    child: Hero(
+                      tag: datas[index]["cid"]!, 
+                      child: Image.asset(
+                        datas[index]["image"]!,
+                        width: 100,
+                        height: 100,
+                      ),
                     ),
                   ),
-                )
-              ],
+                  Expanded(
+                    child: Container(
+                      height: 100,
+                      padding: const EdgeInsets.only(left: 20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            datas[index]["title"]!,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 15,
+                            ),
+                          ),
+                          SizedBox(height: 5,),
+                          Text(
+                            datas[index]["location"]!,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.black.withOpacity(0.3)
+                            ),
+                          ),
+                          SizedBox(height: 5,),
+                          Text(
+                            calcStringToWon(datas[index]["price"]!),
+                            style: TextStyle(
+                              fontWeight: FontWeight.w500
+                            ),
+                            ),
+                          Expanded(
+                            child: Container(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: <Widget>[
+                                  SvgPicture.asset(
+                                    "assets/svg/heart_off.svg",
+                                    width: 13,
+                                    height: 13,
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 5),
+                                    child: Text(datas[index]["likes"]!),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
         );
