@@ -1,3 +1,4 @@
+import 'package:carrot_market/page/favorite.dart';
 import 'package:flutter/material.dart';
 import 'package:carrot_market/page/home.dart';
 import 'package:flutter_svg/svg.dart';
@@ -20,11 +21,6 @@ class _APPState extends State<APP> {
     _currentPageIndex = 0;
   }
 
-  final oCcy = new NumberFormat("#,###", "ko_KR");
-  String calcStringToWon(String priceString){
-    return "${oCcy.format(int.parse(priceString))}원";
-  }
-
   Widget _bodyWidget(){
     switch(_currentPageIndex){
       case 0:
@@ -36,7 +32,7 @@ class _APPState extends State<APP> {
       case 3:
         return Container();
       case 4:
-        return Container();
+        return MyFavoriteContents();
     }
     return Container();
   }

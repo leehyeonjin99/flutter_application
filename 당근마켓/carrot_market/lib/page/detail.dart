@@ -1,6 +1,10 @@
+import 'package:carrot_market/repository/contents_repository.dart';
+import 'package:carrot_market/utils/data_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:carrot_market/components/manor_temperature_widget.dart';
+import 'package:flutter_svg/parser.dart';
+import 'package:flutter_svg/svg.dart';
 
 class DetailContentView extends StatefulWidget {
   Map<String, String> data;
@@ -10,11 +14,49 @@ class DetailContentView extends StatefulWidget {
   _DetailContentViewState createState() => _DetailContentViewState();
 }
 
-class _DetailContentViewState extends State<DetailContentView> {
+class _DetailContentViewState extends State<DetailContentView> with SingleTickerProviderStateMixin{
 
   Size? size;
   List<String>? imgList;
   int? _current;
+  double scrollpositionToAlpha = 0;
+  ScrollController _controller = ScrollController();
+  AnimationController? _animationController;
+  Animation? _colorTween;
+  bool? isMyFavoriteContent = false;
+  final ContentRepository contentRepository = ContentRepository();
+
+  @override
+  void initState(){
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this
+    );
+    _colorTween = ColorTween(
+      begin: Colors.white,
+      end: Colors.black
+    ).animate(_animationController!);
+    _controller.addListener(() {
+      setState(() {
+        if (_controller.offset <= 255.0){
+          scrollpositionToAlpha = _controller.offset;
+        }
+        else{
+          scrollpositionToAlpha = 255.0;
+        }
+        _animationController!.value = scrollpositionToAlpha / 255;
+      });
+    });
+
+    _loadMyFavoriteContentState();
+  }
+
+  _loadMyFavoriteContentState() async{
+    bool ck = await contentRepository.isMyFavoriteContent(widget.data["cid"]!);
+    setState(() {
+      isMyFavoriteContent = ck;
+    });
+  }
 
   @override
   void didChangeDependencies(){
@@ -40,31 +82,37 @@ class _DetailContentViewState extends State<DetailContentView> {
     );
   }
 
+  Widget _makeIcon(IconData icon){
+    return AnimatedBuilder(
+      animation: _colorTween!,
+      builder: (context, child){
+        return Icon(
+          icon,
+          color: _colorTween!.value,
+          );
+      },
+    );
+  }
+
   PreferredSizeWidget _appbarWidget(){
     return AppBar(
-      iconTheme: IconThemeData(
-        color: Colors.white
-      ),
-      backgroundColor: Colors.transparent,
+      backgroundColor: Colors.white.withAlpha(scrollpositionToAlpha.toInt()),
       elevation: 0,
       leading: IconButton(
         onPressed: (){
           Navigator.pop(context);
         },
-        icon: Icon(
-          Icons.arrow_back,
-          color: Colors.white,
-          )
-        ),
+        icon: _makeIcon(Icons.arrow_back)
+      ),
       actions: [
         IconButton(
           onPressed: (){}, 
-          icon: Icon(Icons.share),
+          icon: _makeIcon(Icons.share),
           color: Colors.white,
         ),
         IconButton(
           onPressed: (){}, 
-          icon: Icon(Icons.more_vert),
+          icon: _makeIcon(Icons.more_vert),
           color: Colors.white,
         )
       ],
@@ -73,11 +121,66 @@ class _DetailContentViewState extends State<DetailContentView> {
 
   Widget _bodyWidget(){
 
-    return Column(
-      children: [
-        _makeSliderImage(),
-        _sellerSimpleInfo()
-      ],
+    return CustomScrollView(
+      controller: _controller,
+      slivers: [
+        SliverList(
+          delegate: SliverChildListDelegate(
+            [
+              _makeSliderImage(),
+              _sellerSimpleInfo(),
+              _line(),
+              _contentDetail(),
+              _line(),
+              _otherCellContents()
+            ]
+          )
+        ),
+        SliverPadding(
+          padding: const EdgeInsets.symmetric(horizontal: 15),
+          sliver: SliverGrid(
+            delegate: SliverChildListDelegate(
+              List.generate(
+                20, 
+                (index){
+                  return Container(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(10.0),
+                          child: Container(
+                            color: Colors.grey,
+                            height: 120,
+                          ),
+                        ),
+                        Text(
+                          "상품 제목",
+                          style: TextStyle(
+                            fontSize: 14
+                          ),
+                        ),
+                        Text(
+                          "금액",
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold
+                          ),
+                        )
+                      ],
+                    ),
+                  );
+                }
+              ).toList()
+            ), 
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              mainAxisSpacing: 10,
+              crossAxisSpacing: 10
+            )
+          ),
+        )
+      ]
     );
   }
 
@@ -183,11 +286,181 @@ class _DetailContentViewState extends State<DetailContentView> {
     );
   }
 
+  Widget _line(){
+    return Container(
+      height: 1,
+      color: Colors.grey.withOpacity(0.3),
+    );
+  }
+
+  Widget _contentDetail(){
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 15),
+      width: size!.width,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SizedBox(
+            height: 20,
+          ),
+          Text(
+            widget.data["title"]!,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 20
+            ),
+          ),
+          Text(
+            "디지털/가전 ∙ 22시간 전",
+            style: TextStyle(
+              color: Colors.grey,
+              fontSize: 12
+            ),
+          ),
+          SizedBox(
+            height: 15,
+          ),
+          Text(
+            "선물받은 새상품이고\n상품 꺼내보기만 했습니다\n거래는 직거래만 합니다.",
+            style: TextStyle(
+              fontSize: 15,
+              height: 1.5
+            ),
+          ),
+          SizedBox(
+            height: 15,
+          ),
+          Text(
+            "채팅 3 ∙ 관심 17 ∙ 조회 295",
+            style: TextStyle(
+              color: Colors.grey,
+              fontSize: 12
+            ),
+          ),
+          SizedBox(
+            height: 15,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _otherCellContents(){
+    return Padding(
+      padding: const EdgeInsets.all(15.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            "판매자님의 판매 상품",
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.bold
+            ),
+          ),
+          Text(
+            "모두 보기",
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
   Widget _bottomBarWidget(){
     return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 15),
       width: size!.width,
       height: 55,
-      color: Colors.red
+      child: Row(
+        children: [
+          GestureDetector(
+            child: SvgPicture.asset(
+              "assets/svg/heart_${isMyFavoriteContent!? "on" : "off"}.svg",
+              width: 25,
+              height: 25,
+              color: Color(0xfff08f4f),
+            ),
+            onTap: () async{
+              if (isMyFavoriteContent!){
+                await contentRepository.deleteMyFavoriteContent(widget.data["cid"]!);
+              }
+              else{
+                await contentRepository.addMyFavoriteContent(widget.data);
+              }
+              setState(() {
+                isMyFavoriteContent = !isMyFavoriteContent!;
+              });
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  duration: Duration(milliseconds: 1000),
+                  content: Text(
+                    isMyFavoriteContent!
+                    ? "관심목력에 추가되었습니다"
+                    : "관심목록에 제거되었습니다."
+                  )
+                )
+              );
+            },
+          ),
+          Container(
+            margin: const EdgeInsets.only(
+              left: 15,
+              right: 10
+            ),
+            width: 1,
+            height: 40,
+            color: Colors.grey.withOpacity(0.3),
+          ),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                DataUtils.calcStringToWon(widget.data["price"]!),
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.bold
+                ),  
+              ),
+              Text(
+                "가격제안불가",
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey
+                ),
+              )
+            ],
+          ),
+          Expanded(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5.0),
+                    color: Color(0xfff08f4f)
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 7
+                    ),
+                  child: Text(
+                    "채팅으로 거래하기",
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold
+                    ),
+                  ),
+                ),
+              ],
+            )
+          )
+        ],
+      ),
     );
   }
 }

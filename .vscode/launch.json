@@ -1,0 +1,11 @@
+{
+    "configurations": [
+        {
+            "name": "Flutter (lib/main.dart)",
+            "type": "dart",
+            "request": "launch",
+            "cwd": "당근마켓/carrot_market",
+            "program": "lib/main.dart"
+        }
+    ]
+}

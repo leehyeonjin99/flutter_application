@@ -1,133 +1,72 @@
-import 'package:carrot_market/repository/contents_repository.dart';
 import 'package:carrot_market/page/detail.dart';
+import 'package:carrot_market/repository/contents_repository.dart';
 import 'package:carrot_market/utils/data_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-class Home extends StatefulWidget{
+class MyFavoriteContents extends StatefulWidget {
+  MyFavoriteContents({Key? key}) : super(key: key);
+
   @override
-  _HomeState createState() => _HomeState();
+  State<MyFavoriteContents> createState() => _MyFavoriteContentsState();
 }
 
-class _HomeState extends State<Home>{
+class _MyFavoriteContentsState extends State<MyFavoriteContents> {
 
-  String currentLocation = "ara";
   ContentRepository contentRepository = ContentRepository();
-  final Map<String, String> locationTypeToString = {
-    "ara": "아라동",
-    "ora": "오라동",
-    "donam": "도남동"
-  };
 
   @override
-  void initState() {
+  void initState(){
     super.initState();
-    currentLocation = "ara";
+    print("Init");
   }
 
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: _appbarWidget(),
-      body: _bodyWidget(),
+      body: _bodyWidget()
     );
   }
 
   PreferredSizeWidget _appbarWidget(){
     return AppBar(
-        backgroundColor: Colors.white,
-        elevation: 1,
-        title: GestureDetector(
-          onTap: (){
-            print("click");
-          },
-          onLongPress: (){
-            print("Long Press!!");
-          },
-          child: PopupMenuButton<String>(
-            offset: Offset(-10, 25),
-            shape: ShapeBorder.lerp(
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-              1
-            ),
-            onSelected: (String value) {
-              print(value);
-              setState(() {
-                currentLocation = value;
-              });
-            },
-            itemBuilder: (BuildContext context) {
-              return [
-                PopupMenuItem(
-                  value: "ara",
-                  child: Text("아라동"),
-                ),
-                PopupMenuItem(
-                  value: "ora",
-                  child: Text("오라동"),
-                ),
-                PopupMenuItem(
-                  value: "donam",
-                  child: Text("도남동"),
-                )
-              ];
-            },
-            child: Row(
-              children: [
-                Text(
-                  locationTypeToString[currentLocation]!,
-                  style: TextStyle(color: Colors.black),
-                  ),
-                Icon(
-                  Icons.arrow_drop_down,
-                  color: Colors.black,
-                )
-              ],
-            ),
-          ),
+      title: Text(
+        "관심목록",
+        style: TextStyle(
+          fontSize: 15
         ),
-        actions: [
-          Row(
-            children: [
-              IconButton(
-                onPressed: (){
-
-                },
-                icon: Icon(
-                  Icons.search,
-                  color: Colors.black
-                )
-              ),
-              IconButton(
-                onPressed: (){
-
-                }, 
-                icon: Icon(
-                  Icons.tune,
-                  color: Colors.black
-                )
-              ),
-              IconButton(
-                onPressed: (){
-
-                }, 
-                icon: SvgPicture.asset(
-                  "assets/svg/bell.svg",
-                  width: 23,
-                )
-              )
-            ],
-          )
-        ],
-      );
-  }
-  
-  _loadContents(){
-    return contentRepository.loadContentsFromLocation(currentLocation);
+      ),
+    );
   }
 
-  _makeDataList(List<Map<String, String>> datas){
+  Widget _bodyWidget(){
+    return FutureBuilder(
+      future: _loadMyFavoriteContents(),
+      builder: (BuildContext context, dynamic snapshot){
+        if (snapshot.connectionState != ConnectionState.done){
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+
+        if (snapshot.hasData){
+          return _makeDataList(snapshot.data);
+        }
+
+        return Center(
+          child: Text("해당 지역에 데이터가 없습니다."),
+        );
+        
+      },
+    );
+  }
+
+  Future<List<dynamic>?> _loadMyFavoriteContents() async{
+    return await contentRepository.loadFavoriteContents();
+  }
+
+  _makeDataList(List<dynamic> datas){
     return ListView.separated(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       itemBuilder: (BuildContext context, int index){
@@ -139,10 +78,10 @@ class _HomeState extends State<Home>{
                 context,
                 MaterialPageRoute(
                   builder: (BuildContext context) {
-                    return DetailContentView(data: datas[index]);
+                    return DetailContentView(data:Map<String,String>.from(datas[index]));
                   },
                 )
-              );
+              ).then((value) => setState((() {})));
               print(datas[index]["title"]);
             },
             child: Container(
@@ -225,28 +164,6 @@ class _HomeState extends State<Home>{
       }, 
       itemCount: datas.length,
     );
-  }
+  }  
 
-  Widget _bodyWidget(){
-    return FutureBuilder(
-      future: _loadContents(),
-      builder: (BuildContext context, dynamic snapshot){
-        if (snapshot.connectionState != ConnectionState.done){
-          return Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-
-        if (snapshot.hasData){
-          return _makeDataList(snapshot.data);
-        }
-
-        return Center(
-          child: Text("해당 지역에 데이터가 없습니다."),
-        );
-        
-      },
-    );
-  }
 }
-
