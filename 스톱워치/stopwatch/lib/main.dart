@@ -106,7 +106,7 @@ class _MyHomePageState extends State<MyHomePage> {
             Positioned(
               right: 10,
               bottom: 10,
-              child: RaisedButton(
+              child: ElevatedButton(
                 child: Text('랩타임'),
                 onPressed: (){
                   setState(() {

@@ -61,7 +61,7 @@ class _MyHomePageState extends State<MyHomePage>{
                     controller: _todoController,
                   ),
                 ),
-                RaisedButton(
+                ElevatedButton(
                   child: Text('추가'),
                   onPressed: () => _addTodo(Todo(_todoController.text))
                 ),

@@ -84,7 +84,7 @@ class _BMIMaineState extends State<BMIMain> {
               Container(
                 margin: const EdgeInsets.only(top: 16.0),
                 alignment: Alignment.centerRight,
-                child: RaisedButton(
+                child: ElevatedButton(
                   onPressed: (){
                     if (_formKey.currentState!.validate()){
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
