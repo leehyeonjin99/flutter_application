@@ -4,7 +4,7 @@ import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:sample_state_mangae/src/controller/count_controller_with_getx.dart';
 
 class WithGetX extends StatelessWidget {
-  const WithGetX({Key? key}) : super(key: key);
+  WithGetX({Key? key}) : super(key: key);
 
   Widget _button(String id){
     return ElevatedButton(
@@ -44,7 +44,7 @@ class WithGetX extends StatelessWidget {
             }
           ),
           GetBuilder<CountControllerWithGetX>(
-            id: "second",
+            id: "second", 
             builder: (controller){
               return Text(
                 "${controller.count}",

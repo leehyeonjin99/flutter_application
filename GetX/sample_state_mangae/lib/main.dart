@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:sample_state_mangae/src/binding/binding_page.dart';
+import 'package:sample_state_mangae/src/controller/count_controller_with_getx.dart';
 import 'package:sample_state_mangae/src/home.dart';
 import 'package:get/get.dart';
+import 'package:sample_state_mangae/src/pages/binding.dart';
 import 'package:sample_state_mangae/src/pages/next.dart';
 import 'package:sample_state_mangae/src/pages/normal/first.dart';
 import 'package:sample_state_mangae/src/pages/normal/second.dart';
@@ -27,7 +30,12 @@ class MyApp extends StatelessWidget {
         GetPage(name: '/first', page: () =>  FirstPage()),
         GetPage(name: '/second', page: () =>  SecondPage()),
         GetPage(name: '/next', page:() =>  NextPage()),
-        GetPage(name: '/user/:uid', page:() =>  UserPage())
+        GetPage(name: '/user/:uid', page:() =>  UserPage()),
+        GetPage(
+          name: '/binding', 
+          page: () => BindingPage(),
+          binding: BindingPageBinding()
+        )
       ]
     );
   }
